@@ -77,7 +77,7 @@ docker exec -it mongodb mongoimport \
     `db.restaurants.find( { borough: "Brooklyn" }, { "grades.score": 1, _id: 0 } )`
 - Garder les restaurants de Manhanttan dont le score est inférieur à 10
     `db.restaurants.find( { borough: { $regex: "Manhattan", $options: "i" }, grades: { $elemMatch: { score: { $lt: 10 } } } })`
-- Score inférieur id 
+- Score < 10 sans _id 
     `db.restaurants.find(
   {
   borough: /Manhattan/i,
@@ -91,7 +91,7 @@ docker exec -it mongodb mongoimport \
   }
   )
 `
-- Récupérer uniquement les restaurants qui n'ont pas de score 
+- Récupérer uniquement les restaurants qui n'ont pas de score >= 10 
     `db.restaurants.find(
   {
     grades: {
@@ -102,4 +102,18 @@ docker exec -it mongodb mongoimport \
   }
 )
 `
-- 
+- Restaurants qui ont un grande C et un score < 40
+    `db.restaurants.find({
+  grades: {
+    $elemMatch: {
+      grade: "C",
+      score: { $lt: 40 }
+    }
+  }
+})
+`
+- Valeurs distinctes
+    `db.restaurants.distinct("borough")`
+- Trier des valeurs
+    `db.restaurants.distinct("borough").sort()`
+    `db.restaurants.distinct("borough").sort().reverse()`
