@@ -117,3 +117,147 @@ docker exec -it mongodb mongoimport \
 - Trier des valeurs
     `db.restaurants.distinct("borough").sort()`
     `db.restaurants.distinct("borough").sort().reverse()`
+- Aggregation avec aggregate() pipeline | Restaurant (nom + quartier) dont la dernière inspection a le grade C
+    `db.restaurants.aggregate([
+  {
+    $project: {
+      name: 1,
+      borough: 1,
+      lastInspection: { $arrayElemAt: ["$grades", 0] }
+    }
+  },
+  {
+    $match: {
+      "lastInspection.grade": "C"
+    }
+  }
+])
+`
+- Tri de la requete précedente par name croissant
+    `db.restaurants.aggregate([
+  {
+    $project: {
+      name: 1,
+      borough: 1,
+      lastInspection: { $arrayElemAt: ["$grades", 0] }
+    }
+  },
+  {
+    $match: {
+      "lastInspection.grade": "C"
+    }
+  },
+  {
+    $sort: { name: 1 }
+  }
+])
+`
+- Tri par name decroissant
+    `db.restaurants.aggregate([
+  {
+    $project: {
+      name: 1,
+      borough: 1,
+      lastInspection: { $arrayElemAt: ["$grades", 0] }
+    }
+  },
+  {
+    $match: {
+      "lastInspection.grade": "C"
+    }
+  },
+  {
+    $sort: { name: -1 }
+  }
+])`
+- Compter le total et ajouter un compteur total
+    `db.restaurants.aggregate([
+  {
+    $project: {
+      name: 1,
+      borough: 1,
+      lastInspection: { $arrayElemAt: ["$grades", 0] }
+    }
+  },
+  {
+    $match: {
+      "lastInspection.grade": "C"
+    }
+  },
+  {
+    $group: {
+      _id: null,        
+      total: { $sum: 1 }
+    }
+  }
+])
+`
+- Compter par borough (quartier) le nombre de restaurants concernés puis trier en decroissant
+    `db.restaurants.aggregate([
+  {
+    $project: {
+      name: 1,
+      borough: 1,
+      lastInspection: { $arrayElemAt: ["$grades", 0] }
+    }
+  },
+  {
+    $match: {
+      "lastInspection.grade": "C"
+    }
+  },
+  {
+    $group: {
+      _id: "$borough",
+      total: { $sum: 1 }
+    }
+  },
+  {
+    $sort: { total: -1 }
+  }
+])
+`
+- Moyenne des scores par quartier puis trier le score par ordre decroissant
+    `db.restaurants.aggregate([
+  {
+    $unwind: "$grades"
+  },
+  {
+    $group: {
+      _id: "$borough",
+      avgScore: { $avg: "$grades.score" }
+    }
+  },
+  {
+    $sort: { avgScore: -1 }
+  }
+])
+`
+- Mise à jour d'un document 
+  - Trouver le document `db.restaurants.findOne({ name: "Riviera Caterer" })`
+  - Changer le nom `db.restaurants.updateOne(
+    { _id: ObjectId("699718746944f0a4c8cd1448") },
+    { $set: { name: "Riviera Caterer Updated" } }
+    )`
+  - Verifier `db.restaurants.find(
+  { _id: ObjectId("699718746944f0a4c8cd1448") }
+)
+`
+- Suppression d'un document
+  - `db.restaurants.deleteOne(
+    { _id: ObjectId("699718746944f0a4c8cd1448") }
+    )`
+  - `db.restaurants.find(
+    { _id: ObjectId("699718746944f0a4c8cd1448") }
+    )`
+- Indexation 2dsphere et requêtes géographiques
+  - 
+
+
+## Quelques rappels
+Rappel des opérateurs à mobiliser
+• $match : filtrer
+• $project : choisir / transformer les champs
+• $sort : trier
+• $group : agréger (compter, moyenne, somme…)
+• $unwind : “déplier” une liste en plusieurs documents
