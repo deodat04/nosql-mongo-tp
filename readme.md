@@ -256,8 +256,13 @@ docker exec -it mongodb mongoimport \
 
 ## Quelques rappels
 Rappel des opérateurs à mobiliser
+
 • $match : filtrer
+
 • $project : choisir / transformer les champs
+
 • $sort : trier
+
 • $group : agréger (compter, moyenne, somme…)
+
 • $unwind : “déplier” une liste en plusieurs documents
