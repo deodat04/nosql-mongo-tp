@@ -59,25 +59,37 @@ docker exec -it mongodb mongoimport \
 
 ## Quelques commandes pour le filtrage
 - Filtrage sur les restaurants dont le quartier est Brooklyn
+
     `db.restaurants.find({ borough: "Brooklyn" })`
 - Compter le nombre de résultats
+
     `db.restaurants.find().count()`
 - Restaurant situé à la 5th avenue
+
     `db.restaurants.find({ "address.street": "5 Avenue" }).limit(10)`
+
 - Restaurant dont le name contient Pizza avec recherche insensible à la casse
+
     `db.restaurants.find( { name: { $regex: "pizza", $options: "i" } } ).limit(10)`
 - Ajouter une projection pour ne retourner que le champ name
+
     `db.restaurants.find({ name: /pizza/i },{ name: 1 })`
 - Sans afficher _id
+
     `db.restaurants.find({ name: /pizza/i },{ name: 1, _id: 0 })`
+
     `db.restaurants.find( { name: { $regex: "pizza", $options: "i" } }, {name: 1, _id: 0} )`
 - Filtrer un sous ensembre de restaurant
+
     `db.restaurants.find({ borough: "Brooklyn" },{ "grades.score": 1 })`
 - Projeter le champ grades.score et sans _id
+
     `db.restaurants.find( { borough: "Brooklyn" }, { "grades.score": 1, _id: 0 } )`
 - Garder les restaurants de Manhanttan dont le score est inférieur à 10
+
     `db.restaurants.find( { borough: { $regex: "Manhattan", $options: "i" }, grades: { $elemMatch: { score: { $lt: 10 } } } })`
 - Score < 10 sans _id 
+
     `db.restaurants.find(
   {
   borough: /Manhattan/i,
@@ -92,6 +104,7 @@ docker exec -it mongodb mongoimport \
   )
 `
 - Récupérer uniquement les restaurants qui n'ont pas de score >= 10 
+
     `db.restaurants.find(
   {
     grades: {
@@ -103,6 +116,7 @@ docker exec -it mongodb mongoimport \
 )
 `
 - Restaurants qui ont un grande C et un score < 40
+
     `db.restaurants.find({
   grades: {
     $elemMatch: {
@@ -113,11 +127,15 @@ docker exec -it mongodb mongoimport \
 })
 `
 - Valeurs distinctes
+
     `db.restaurants.distinct("borough")`
 - Trier des valeurs
+
     `db.restaurants.distinct("borough").sort()`
+
     `db.restaurants.distinct("borough").sort().reverse()`
 - Aggregation avec aggregate() pipeline | Restaurant (nom + quartier) dont la dernière inspection a le grade C
+
     `db.restaurants.aggregate([
   {
     $project: {
@@ -134,6 +152,7 @@ docker exec -it mongodb mongoimport \
 ])
 `
 - Tri de la requete précedente par name croissant
+
     `db.restaurants.aggregate([
   {
     $project: {
@@ -153,6 +172,7 @@ docker exec -it mongodb mongoimport \
 ])
 `
 - Tri par name decroissant
+
     `db.restaurants.aggregate([
   {
     $project: {
@@ -171,6 +191,7 @@ docker exec -it mongodb mongoimport \
   }
 ])`
 - Compter le total et ajouter un compteur total
+
     `db.restaurants.aggregate([
   {
     $project: {
@@ -193,6 +214,7 @@ docker exec -it mongodb mongoimport \
 ])
 `
 - Compter par borough (quartier) le nombre de restaurants concernés puis trier en decroissant
+
     `db.restaurants.aggregate([
   {
     $project: {
@@ -218,6 +240,7 @@ docker exec -it mongodb mongoimport \
 ])
 `
 - Moyenne des scores par quartier puis trier le score par ordre decroissant
+
     `db.restaurants.aggregate([
   {
     $unwind: "$grades"
@@ -233,17 +256,25 @@ docker exec -it mongodb mongoimport \
   }
 ])
 `
-- Mise à jour d'un document 
-  - Trouver le document `db.restaurants.findOne({ name: "Riviera Caterer" })`
-  - Changer le nom `db.restaurants.updateOne(
+- Mise à jour d'un document
+
+  - Trouver le document
+  
+    `db.restaurants.findOne({ name: "Riviera Caterer" })`
+  - Changer le nom
+  
+    `db.restaurants.updateOne(
     { _id: ObjectId("699718746944f0a4c8cd1448") },
     { $set: { name: "Riviera Caterer Updated" } }
     )`
-  - Verifier `db.restaurants.find(
-  { _id: ObjectId("699718746944f0a4c8cd1448") }
+  - Verification
+  
+    `db.restaurants.find(
+    { _id: ObjectId("699718746944f0a4c8cd1448") }
 )
 `
 - Suppression d'un document
+
   - `db.restaurants.deleteOne(
     { _id: ObjectId("699718746944f0a4c8cd1448") }
     )`
